@@ -1,12 +1,23 @@
 # 🛠️ Cisco CLI Commands – Quick Reference Guide
 
-A handy reference for essential Cisco IOS commands.
+A categorized reference for essential Cisco IOS commands.
 
 ---
 
-## 🔄 Reboot the Device
+## 📁 Categories
 
-Reload (reboot) the switch or router:
+* [🔄 Device Reboot](#-device-reboot)
+* [📝 Configuration Management](#-configuration-management)
+* [🗃️ File & Memory Management](#-file--memory-management)
+* [🌐 Interface & IP Info](#-interface--ip-info)
+* [🔧 VLAN Management](#-vlan-management)
+* [🔒 Console & Password Security](#-console--password-security)
+* [📡 Trunking & Encapsulation](#-trunking--encapsulation)
+* [🧰 Miscellaneous Useful Commands](#-miscellaneous-useful-commands)
+
+---
+
+## 🔄 Device Reboot
 
 ```bash
 reload
@@ -16,29 +27,15 @@ reload
 
 ## 📝 Configuration Management
 
-### Show Configurations
-
-Current running configuration:
+### Show Configuration
 
 ```bash
 show running-config
-```
-
-Saved startup configuration:
-
-```bash
 show startup-config
-```
-
-Show running config for a specific interface:
-
-```bash
 show running-config interface FastEthernet 0/1
 ```
 
 ### Set Hostname
-
-Change the device name:
 
 ```bash
 hostname <new-hostname>
@@ -46,141 +43,93 @@ hostname <new-hostname>
 
 ### Save Configuration
 
-Save running config to NVRAM:
-
 ```bash
 wr
-```
-
-Manually copy to startup config:
-
-```bash
 copy running-config startup-config
-```
-
-Copy to flash:
-
-```bash
 copy running-config flash:
 ```
 
 ---
 
-## 🗃️ File and Memory Management
-
-Read file contents:
+## 🗃️ File & Memory Management
 
 ```bash
 more <file-name>
-```
-
-Delete a file:
-
-```bash
 delete <file-name>
-```
-
-Erase the startup configuration:
-
-```bash
 erase startup-config
-```
-
-Format flash memory:
-
-```bash
 format flash:
 ```
 
 ---
 
-## 🌐 Interface & IP Information
+## 🌐 Interface & IP Info
 
 ### Interface Details
 
-Show detailed status:
-
 ```bash
 show interface status
-```
-
-Show specific interface details:
-
-```bash
 show interface FastEthernet 0/1
-```
-
-Show switchport config of an interface:
-
-```bash
 show interfaces FastEthernet 0/1 switchport
 ```
 
 ### IP Interface Overview
 
-Brief summary of IP interfaces:
-
 ```bash
 show ip interface brief
 ```
 
-### VLAN & Trunk Info
-
-Show VLANs:
+### Assign IP to VLAN
 
 ```bash
-show vlan
-show vlan brief
+interface vlan 30
+ip address 192.168.1.100 255.255.255.0
+no shutdown
+exit
 ```
 
-Show trunking ports:
-
 ```bash
-show interfaces trunk
+interface vlan 10
+ip address 192.168.1.1 255.255.255.255
+exit
 ```
 
 ---
 
-## 🌐 VLAN Configuration Examples
+## 🔧 VLAN Management
 
-### Create VLAN
+### Show VLAN Info
 
 ```bash
-configure terminal
+show vlan
+show vlan brief
+show vlan-switch
+```
+
+### Create/Delete VLANs
+
+```bash
 vlan 10
 name MyVLAN
 exit
+no vlan 10
 ```
 
-### Create Multiple VLANs
-
 ```bash
-configure terminal
 vlan 30,40
 name MyVLAN
 exit
 ```
 
-### Delete VLAN
+### Assign VLAN to Interfaces
 
 ```bash
-no vlan 10
-```
-
-### Assign VLAN to Port
-
-```bash
-configure terminal
 interface FastEthernet 0/1
 switchport mode access
 switchport access vlan 10
 exit
 ```
 
-### Assign VLAN to Port Range (Examples)
-
 ```bash
-configure terminal
 interface range FastEthernet 0/1 , FastEthernet 0/5
 switchport mode access
 switchport access vlan 20
@@ -188,65 +137,149 @@ exit
 ```
 
 ```bash
-configure terminal
 interface range FastEthernet 0/1 - 5
 switchport mode access
 switchport access vlan 20
 exit
 ```
 
+```bash
+interface FastEthernet 0/1
+no switchport access vlan 10
+exit
+```
+
+```bash
+interface range FastEthernet 0/1-4
+switchport mode access
+switchport access vlan 10
+switchport voice vlan 30
+exit
+```
+
 ---
 
-## 🧰 Additional Useful Commands
+## 🔒 Console & Password Security
 
-Routing table:
+### Basic Console Password
+
+```bash
+line console 0
+password 123
+login
+```
+
+### Encrypted Console Password
+
+```bash
+service password-encryption
+line console 0
+password 123
+login
+enable secret 123
+```
+
+### SHA-256 Encrypted Console + Enable Password
+
+```bash
+service password-encryption
+line console 0
+password 123
+login
+enable algorithm-type sha-256 secret 123
+```
+
+### Local User Authentication with SHA-256
+
+```bash
+service password-encryption
+line console 0
+login local
+enable algorithm-type sha-256 secret 123
+username radin algorithm-type sha-256 secret 123
+```
+
+---
+
+## 📡 Trunking & Encapsulation
+
+### Trunk Concepts
+
+* **Trunk Modes**:
+
+  * ISL (Inter Switch Link)
+  * IEEE 802.1Q
+
+**802.1Q Tag Fields (4 bytes)**:
+
+* Type (16 bits): `0x8100`
+* Priority (3 bits)
+* Flag (1 bit)
+* VLAN ID (12 bits)
+
+### Trunk Configuration Examples
+
+#### Basic Trunking
+
+```bash
+interface FastEthernet 0/1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+vtp mode off
+exit
+```
+
+#### Allow Specific VLANs
+
+```bash
+interface FastEthernet 0/1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allow vlan 10,20
+vtp mode off
+exit
+```
+
+#### Add VLAN to Trunk
+
+```bash
+interface FastEthernet 0/1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allow vlan 10,20
+switchport trunk allow vlan add 30
+vtp mode off
+exit
+```
+
+#### Exclude VLANs from Trunk
+
+```bash
+interface FastEthernet 0/1
+switchport trunk encapsulation dot1q
+switchport mode trunk
+switchport trunk allow vlan except 10,20
+vtp mode off
+exit
+```
+
+### Show Trunk Info
+
+```bash
+show interfaces trunk
+```
+
+---
+
+## 🧰 Miscellaneous Useful Commands
 
 ```bash
 show ip route
-```
-
-Device version & hardware info:
-
-```bash
 show version
-```
-
-Neighbor devices (CDP):
-
-```bash
 show cdp neighbors
-```
-
-MAC address table:
-
-```bash
 show mac address-table
-```
-
-Ping:
-
-```bash
 ping <destination-ip>
-```
-
-Traceroute:
-
-```bash
 traceroute <destination-ip>
+switchport nonegotiate
 ```
 
----
-
-## 🔍 Switchport Types
-
-* **Access** – Dedicated to a single VLAN
-* **Trunk** – Carries multiple VLANs
-* **Dynamic Auto** – Negotiates trunking with the peer
-
-
-```
-interface vlan 30 
-ip address 192.168.1.100 255.255.255.0
-no shutdown
-exit
-```
