@@ -283,3 +283,53 @@ traceroute <destination-ip>
 switchport nonegotiate
 ```
 
+```
+copy flash: tftp:
+```
+
+```
+copy tftp: flash:
+```
+
+banner:
+```
+banner motd #
+```
+
+```
+boot system tftp <ios-name> <tftp-server-ip>
+```
+```
+boot system flash:<ios-name>
+```
+
+```
+IP_ADDRESS=<ip>
+IP_SUBNET_MASK=<subnet-ip>
+DEFAULT_GATEWAY=<DEFAULT_GATEWAY>
+TFTP_SERVER=<tftp-ip>
+TFTP_FILE=<file-name>
+Set
+tftpdnld
+```
+
+reset password on switch
+```
+flash_init
+dir flash:
+rename flash:config.text flash:sematec.text
+boot
+```
+reset password on router
+config-register
+0x2102 --> normal opration
+0x2142 --> password recovery
+```
+confreg 0x2142
+boot
+copy startup-config running-config
+wr
+reload and break
+confreg 0x2102
+boot
+```
