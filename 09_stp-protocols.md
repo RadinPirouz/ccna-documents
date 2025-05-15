@@ -1,95 +1,126 @@
-# 🌲 Spanning Tree Protocol (STP)
+# 🌲 Spanning Tree Protocol (STP) Overview
 
-## STP Variants
+## 🧬 STP Variants
 
-- **STP (PVST+)** – IEEE 802.1d
-- **Rapid STP (RSTP)** – IEEE 802.1w
-- **Multiple STP (MSTP)** – IEEE 802.1s
-- Max Limit 128 (1 STP Per Vlan)
+| Protocol                | IEEE Standard | Description                                  |
+| ----------------------- | ------------- | -------------------------------------------- |
+| **STP (PVST+)**         | 802.1D        | Per-VLAN STP used in Cisco networks          |
+| **Rapid STP (RSTP)**    | 802.1W        | Faster convergence than traditional STP      |
+| **Multiple STP (MSTP)** | 802.1S        | Maps multiple VLANs to a single STP instance |
 
-## Root Bridge
+> 🔹 **Limit**: Up to **128 STP instances** (1 STP instance per VLAN in PVST+)
 
-- Central reference switch in STP.
-- Default bridge priority: `32768`.
-- Bridge ID = Priority + MAC address (e.g. 32768.AA:AA:AA:AA:AA:AA).
-- Priorities must be multiples of 4096 (0, 4096, 8192, ..., 32768).
-- BPDUs (Bridge Protocol Data Units) carry the bridge ID.
+---
 
-in vlans: priority always + vlan
-32768 + vlan id
+## 🏛 Root Bridge
 
+* Acts as the **central reference point** in an STP topology.
+* **Default bridge priority**: `32768`.
+* **Bridge ID** = Priority + MAC Address
+  Example: `32768.AA:AA:AA:AA:AA:AA`
+* Priority values must be **multiples of 4096**:
+  `0, 4096, 8192, ..., 61440`
+* **BPDU (Bridge Protocol Data Unit)** carries the Bridge ID.
 
-## STP Cost by Bandwidth
+> In VLANs, bridge priority is calculated as:
+> `32768 + VLAN ID`
 
-| Bandwidth | STP Cost |
-|-----------|----------|
-| 10 Gbps   | 2        |
-| 1 Gbps    | 4        |
-| 100 Mbps  | 19       |
-| 10 Mbps   | 100      |
+---
 
+## ⚙️ STP Path Cost by Bandwidth
 
-## Port Roles
+| Bandwidth | Cost |
+| --------- | ---- |
+| 10 Gbps   | 2    |
+| 1 Gbps    | 4    |
+| 100 Mbps  | 19   |
+| 10 Mbps   | 100  |
 
-- **Root Port**: Closest port (lowest cost) to the root bridge.
-- **Designated Port**: Chosen for each network segment to forward traffic.
-- **Blocked Port**: Prevents loops by not forwarding traffic.
+---
 
-```
+## 🔌 STP Port Roles
+
+* **Root Port**:
+  Port on a non-root switch with the **lowest path cost** to the root bridge.
+
+* **Designated Port**:
+  One per segment; **forwards traffic** towards and from that segment.
+
+* **Blocked Port**:
+  Prevents loops by **not forwarding traffic**.
+
+---
+
+## 🔍 Useful STP Commands (Cisco)
+
+```bash
 show spanning-tree
+show spanning-tree summary
 ```
 
-```
-show spanning-tree summery
-```
+---
 
+## 🔄 Path Cost Calculation Mode
 
-modes:
-short ==>
-long ==>
-```
-spanning-tree pathcost method <mode>
+Sets how path cost is computed based on interface bandwidth:
+
+```bash
+spanning-tree pathcost method <short | long>
 ```
 
+* `short`: Legacy method (max speed 1 Gbps)
+* `long`: Modern method (supports speeds above 1 Gbps)
 
-modes:
-mst 
-pvst
-rappid-pvst
+---
 
+## 🚦 STP Modes
+
+```bash
+spanning-tree mode <pvst | rapid-pvst | mst>
 ```
-spanning-tree mode <mode>
-```
 
+* `pvst`: Per VLAN Spanning Tree (Cisco)
+* `rapid-pvst`: Rapid PVST (faster convergence)
+* `mst`: Multiple Spanning Tree (groups VLANs)
 
-BPDU:
-Hello = every 2s
-Forward Delay = 15 Second
-Max Age = 20 second
+---
 
+## ⏱ BPDU Timers
 
-STP Port Roles: 
-Root Port ==> 
-Listenging Packets BPDU Forward Delay 15s
-Learning Packets BPDU Forward Delay 15s
-Forwarding --> working
+| Timer             | Value  | Description                             |
+| ----------------- | ------ | --------------------------------------- |
+| **Hello Time**    | 2 sec  | Time between BPDU transmissions         |
+| **Forward Delay** | 15 sec | Listening → Learning → Forwarding delay |
+| **Max Age**       | 20 sec | Time a switch stores BPDU info          |
 
-Designated ==>
-Listenging Packets BPDU Forward Delay 15s
-Learning Packets BPDU Forward Delay 15s
-Forwarding --> working
+---
 
+## 🔁 STP Port States
 
-Block ==> 
-Blocking
+### Root & Designated Ports
 
+* **Listening**: Receives BPDUs only (15 sec)
+* **Learning**: Learns MACs, still no forwarding (15 sec)
+* **Forwarding**: Fully operational
 
-Directoru Topology Change ==>
-Indirect Topology Change ==>
+### Blocked Port
 
+* **Blocking**: Receives BPDUs, does not forward traffic
 
+---
 
+## 🌀 Topology Changes
 
-TCN ==> Topolofy Change NOtification BPDN
+* **Direct Topology Change**:
+  Immediate changes, such as a directly connected link going down.
 
+* **Indirect Topology Change**:
+  Changes due to multiple hops or indirect link failure.
+
+---
+
+## 🔔 TCN (Topology Change Notification)
+
+* TCN BPDU is sent to notify the root bridge of a topology change.
+* Triggers MAC address table flush to ensure accurate forwarding.
 
