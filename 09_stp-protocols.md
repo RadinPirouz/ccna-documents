@@ -123,4 +123,3 @@ spanning-tree mode <pvst | rapid-pvst | mst>
 
 * TCN BPDU is sent to notify the root bridge of a topology change.
 * Triggers MAC address table flush to ensure accurate forwarding.
-
