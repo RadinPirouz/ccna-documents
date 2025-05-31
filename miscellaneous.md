@@ -7,7 +7,6 @@ show cdp neighbors
 show mac address-table
 ping <destination-ip>
 traceroute <destination-ip>
-switchport nonegotiate
 ````
 
 ### File Transfer

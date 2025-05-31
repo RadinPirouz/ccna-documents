@@ -28,7 +28,14 @@ Point-To-Point port:
 spanning-tree mode rapid-pvst
 ```
 
+```bash
+spanning-tree vlan 1-4094 priority 0 
+```
+
 BPDU On RSTP:
     Proposal BPDU:
     Afreeement BPDU:
+
+
+
     
