@@ -65,3 +65,15 @@ encapsulation dot1Q 50 native
 ip address 192.168.50.1 255.255.255.0
 exit
 ```
+
+
+
+
+```bash
+mac access-list extended BLOCK-MAC
+deny host FFF.FFF.FFF.FFF any
+permit any any
+
+interface ethernet 0/1
+mac access-group BLOCK-MAC in
+```
